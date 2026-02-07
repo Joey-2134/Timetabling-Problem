@@ -39,7 +39,7 @@ def check_solution(solution, student_matrix):
         #     print(f"Student {i:2d} has no conflicts")  # example: Student0 exams: [5, 6, 7] in timeslots: [2, 3, 4], no violation
 
     fitness = ((len(student_matrix) - violations) * 100) - consecutive_exams_count
-    return fitness
+    return fitness, violations, consecutive_exams_count
 
 def initialize_population(population_size, num_exams, num_timeslots):
     population = []
@@ -52,7 +52,7 @@ def initialize_population(population_size, num_exams, num_timeslots):
 
 def generate_next_generation(population, student_matrix, pop_size, tournament_size, crossover_rate, mutation_rate, num_timeslots, elite_percentage):
     next_gen_population = []
-    fitnesses = [check_solution(solution, student_matrix) for solution in population]
+    fitnesses = [check_solution(solution, student_matrix)[0] for solution in population]
 
     # Elitism - Keep the top elite_percentage of solutions
     num_elites = max(1, int(pop_size * elite_percentage))
@@ -87,3 +87,18 @@ def generate_next_generation(population, student_matrix, pop_size, tournament_si
         next_gen_population.extend([child1, child2])
 
     return next_gen_population
+def run_ga(student_matrix, num_exams, num_timeslots, pop_size, tournament_size, num_generations, crossover_rate, mutation_rate, elite_percentage):
+    population = initialize_population(pop_size, num_exams, num_timeslots)
+    avg_fitnesses = []
+    best_fitnesses = []
+
+    for gen in range(num_generations):
+        population = generate_next_generation(population, student_matrix, pop_size, tournament_size, crossover_rate, mutation_rate, num_timeslots, elite_percentage)
+        fitnesses = [check_solution(solution, student_matrix)[0] for solution in population]
+        avg_fitnesses.append(sum(fitnesses) / len(fitnesses))
+        best_fitnesses.append(max(fitnesses))
+
+    best_idx = fitnesses.index(max(fitnesses))
+    best_solution = population[best_idx]
+    best_fitness, hard_violations, soft_violations = check_solution(best_solution, student_matrix)
+    return best_solution, best_fitness, hard_violations, soft_violations, avg_fitnesses, best_fitnesses
