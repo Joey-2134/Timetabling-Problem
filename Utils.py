@@ -16,18 +16,30 @@ def read_instance(filename):
 
 def check_solution(solution, student_matrix):
     violations = 0
+    consecutive_exams_count = 0
     for (i, row) in enumerate(student_matrix):
         student_exams = [j for j, exam in enumerate(row) if exam == 1]
         student_timeslots = [solution[exam] for exam in student_exams]
+        sorted_student_timeslots = sorted(student_timeslots)
+        j = 0
+
+        # Count consecutive exams for the student
+        while j < len(student_timeslots)-1:
+            if sorted_student_timeslots[j+1] - sorted_student_timeslots[j] == 1:
+                consecutive_exams_count += 1
+            j += 1
+
         # print(f"Student {i:2d} is enrolled in exams: {student_exams} which take place in timeslots: {student_timeslots}")
 
+        # Check for hard constraint violation
         if len(student_timeslots) != len(set(student_timeslots)):
             # print(f"Student {i:2d} has a hard constraint violation")  # example: Student2 exams: [0, 4, 6] in timeslots: [1, 1, 3], violation
             violations += 1
         # else:
         #     print(f"Student {i:2d} has no conflicts")  # example: Student0 exams: [5, 6, 7] in timeslots: [2, 3, 4], no violation
 
-    return len(student_matrix) - violations # number of students without hard constraint violations, higher the better
+    fitness = ((len(student_matrix) - violations) * 100) - consecutive_exams_count
+    return fitness
 
 def initialize_population(population_size, num_exams, num_timeslots):
     population = []
