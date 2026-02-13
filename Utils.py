@@ -88,13 +88,15 @@ def generate_next_generation(population, student_matrix, pop_size, tournament_si
 
     return next_gen_population
 def run_ga(student_matrix, num_exams, num_timeslots, pop_size, tournament_size, num_generations, crossover_rate, mutation_rate, elite_percentage):
-    population = initialize_population(pop_size, num_exams, num_timeslots)
+    population = initialize_population(pop_size, num_exams, num_timeslots) # randomly generated initial population
     avg_fitnesses = []
     best_fitnesses = []
 
     for gen in range(num_generations):
-        population = generate_next_generation(population, student_matrix, pop_size, tournament_size, crossover_rate, mutation_rate, num_timeslots, elite_percentage)
-        fitnesses = [check_solution(solution, student_matrix)[0] for solution in population]
+        population = generate_next_generation(population, student_matrix, pop_size,
+                                              tournament_size, crossover_rate, mutation_rate,
+                                              num_timeslots, elite_percentage) # generate next population based
+        fitnesses = [check_solution(solution, student_matrix)[0] for solution in population] # calculate fitnesses of each solution in new generation
         avg_fitnesses.append(sum(fitnesses) / len(fitnesses))
         best_fitnesses.append(max(fitnesses))
 
